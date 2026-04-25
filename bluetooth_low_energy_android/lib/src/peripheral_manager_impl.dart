@@ -157,6 +157,7 @@ final class PeripheralManagerImpl
 
   @override
   Future<void> startAdvertising(Advertisement advertisement) async {
+    final androidOptions = advertisement.androidOptions;
     final nameArgs = advertisement.name;
     if (nameArgs != null) {
       _logger.info('setName: $nameArgs');
@@ -167,12 +168,24 @@ final class PeripheralManagerImpl
         );
       }
     }
+    final settings = androidOptions?.settings;
     final settingsArgs = AdvertiseSettingsArgs(
-      modeArgs: AdvertiseModeArgs.balanced,
-      connectableArgs: true,
+      modeArgs: settings?.mode?.toArgs() ?? AdvertiseModeArgs.balanced,
+      connectableArgs: settings?.connectable ?? true,
+      timeoutArgs: settings?.timeout,
+      txPowerLevelArgs: settings?.txPowerLevel?.toArgs(),
+      legacyArgs: settings?.legacy,
+      anonymousArgs: settings?.anonymous,
+      includeTxPowerArgs: settings?.includeTxPower,
+      primaryPhyArgs: settings?.primaryPhy?.toArgs(),
+      secondaryPhyArgs: settings?.secondaryPhy?.toArgs(),
     );
-    final advertiseDataArgs = advertisement.toAdvertiseDataArgs();
-    final scanResponseArgs = advertisement.toScanResponseArgs();
+    final advertiseDataArgs = advertisement.toAdvertiseDataArgs(
+      androidOptions?.advertiseData,
+    );
+    final scanResponseArgs = advertisement.toScanResponseArgs(
+      androidOptions?.scanResponseData,
+    );
     _logger.info(
       'startAdvertising: $settingsArgs, $advertiseDataArgs, $scanResponseArgs',
     );

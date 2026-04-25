@@ -1,4 +1,7 @@
 {
   "dart.flutterSdkPath": ".fvm/versions/3.35.7",
-  "yaml.format.singleQuote": true
+  "yaml.format.singleQuote": true,
+  "chat.tools.terminal.autoApprove": {
+    "f": true
+  }
 }

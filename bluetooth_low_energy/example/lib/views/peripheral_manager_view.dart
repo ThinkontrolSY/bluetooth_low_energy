@@ -33,6 +33,16 @@ class PeripheralManagerView extends StatelessWidget {
                     : null,
             child: Text(advertising ? 'END' : 'BEGIN'),
           ),
+          TextButton(
+            onPressed:
+                state == BluetoothLowEnergyState.poweredOn && !advertising
+                    ? () async {
+                      await viewModel
+                          .startAdvertisingWithAdvancedAndroidSettings();
+                    }
+                    : null,
+            child: const Text('ADVANCED'),
+          ),
         ],
       ),
       body: buildBody(context),

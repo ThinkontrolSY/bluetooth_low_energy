@@ -28,6 +28,8 @@ enum AdvertiseModeArgs { lowPower, balanced, lowLatency }
 
 enum TXPowerLevelArgs { ultraLow, low, medium, high }
 
+enum PhyArgs { le1m, le2m, leCoded }
+
 enum ConnectionStateArgs { disconnected, connecting, connected, disconnecting }
 
 enum GATTCharacteristicPropertyArgs {
@@ -111,12 +113,22 @@ class AdvertiseSettingsArgs {
   final bool? connectableArgs;
   final int? timeoutArgs;
   final TXPowerLevelArgs? txPowerLevelArgs;
+  final bool? legacyArgs;
+  final bool? anonymousArgs;
+  final bool? includeTxPowerArgs;
+  final PhyArgs? primaryPhyArgs;
+  final PhyArgs? secondaryPhyArgs;
 
   AdvertiseSettingsArgs(
     this.modeArgs,
     this.connectableArgs,
     this.timeoutArgs,
     this.txPowerLevelArgs,
+    this.legacyArgs,
+    this.anonymousArgs,
+    this.includeTxPowerArgs,
+    this.primaryPhyArgs,
+    this.secondaryPhyArgs,
   );
 }
 

@@ -162,6 +162,132 @@ class PeripheralManagerViewModel extends ViewModel {
     notifyListeners();
   }
 
+  /// Example: Start advertising with advanced Android-specific settings.
+  /// 
+  /// This demonstrates all available Android BLE advertising controls:
+  /// - Advertising mode (affects interval/frequency)
+  /// - TX power level
+  /// - Timeout duration
+  /// - Extended advertising features (API 26+)
+  /// - Custom advertise/scan response payloads
+  Future<void> startAdvertisingWithAdvancedAndroidSettings() async {
+    if (_advertising) {
+      return;
+    }
+    await _manager.removeAllServices();
+    final elements = List.generate(100, (i) => i % 256);
+    final value = Uint8List.fromList(elements);
+    final service = GATTService(
+      uuid: UUID.short(100),
+      isPrimary: true,
+      includedServices: [],
+      characteristics: [
+        GATTCharacteristic.immutable(
+          uuid: UUID.short(200),
+          value: value,
+          descriptors: [],
+        ),
+      ],
+    );
+    await _manager.addService(service);
+
+    // Low-power advertising: interval ~1000ms, low power consumption
+    // final lowPowerAdv = Advertisement(
+    //   name: 'BLE-LowPower',
+    //   serviceUUIDs: [UUID.short(100)],
+    //   androidOptions: AndroidAdvertisingOptions(
+    //     settings: AndroidAdvertiseSettings(
+    //       mode: AndroidAdvertiseMode.lowPower,
+    //       connectable: true,
+    //       timeout: 30000, // 30 seconds
+    //       txPowerLevel: AndroidTXPowerLevel.low,
+    //     ),
+    //   ),
+    // );
+
+    // Balanced mode: interval ~250ms, moderate power (good for general use)
+    final balancedAdv = Advertisement(
+      name: 'BLE-Balanced',
+      serviceUUIDs: [UUID.short(100)],
+      androidOptions: AndroidAdvertisingOptions(
+        settings: AndroidAdvertiseSettings(
+          mode: AndroidAdvertiseMode.balanced,
+          connectable: true,
+          timeout: 60000, // 60 seconds
+          txPowerLevel: AndroidTXPowerLevel.medium,
+        ),
+      ),
+    );
+
+    // Low-latency advertising: interval ~100ms, high power (for proximity)
+    // final lowLatencyAdv = Advertisement(
+    //   name: 'BLE-HighPerf',
+    //   serviceUUIDs: [UUID.short(100)],
+    //   androidOptions: AndroidAdvertisingOptions(
+    //     settings: AndroidAdvertiseSettings(
+    //       mode: AndroidAdvertiseMode.lowLatency,
+    //       connectable: true,
+    //       timeout: 10000, // 10 seconds
+    //       txPowerLevel: AndroidTXPowerLevel.high,
+    //     ),
+    //   ),
+    // );
+
+    // Extended advertising with PHY settings (Android 8.0+ / API 26+)
+    // final extendedAdv = Advertisement(
+    //   name: 'BLE-Extended',
+    //   serviceUUIDs: [UUID.short(100)],
+    //   manufacturerSpecificData: [
+    //     ManufacturerSpecificData(
+    //       id: 0x2e19,
+    //       data: Uint8List.fromList([0x01, 0x02, 0x03]),
+    //     ),
+    //   ],
+    //   androidOptions: AndroidAdvertisingOptions(
+    //     settings: AndroidAdvertiseSettings(
+    //       mode: AndroidAdvertiseMode.balanced,
+    //       connectable: true,
+    //       timeout: 45000, // 45 seconds
+    //       txPowerLevel: AndroidTXPowerLevel.medium,
+    //       // Extended advertising settings (API 26+)
+    //       legacy: false, // Use extended advertising PDU
+    //       anonymous: false,
+    //       includeTxPower: true,
+    //       primaryPhy: AndroidPhy.le1m,
+    //       secondaryPhy: AndroidPhy.le2m,
+    //     ),
+    //     // Customize advertise payload separately from scan response
+    //     advertiseData: AndroidAdvertiseData(
+    //       includeDeviceName: true,
+    //       includeTxPowerLevel: true,
+    //       serviceUUIDs: [UUID.short(100)],
+    //     ),
+    //     // Separate scan response payload
+    //     scanResponseData: AndroidAdvertiseData(
+    //       includeDeviceName: false,
+    //       manufacturerSpecificData: [
+    //         ManufacturerSpecificData(
+    //           id: 0x2e19,
+    //           data: Uint8List.fromList([0xAA, 0xBB, 0xCC]),
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
+
+    await _manager.startAdvertising(balancedAdv);
+    _advertising = true;
+    notifyListeners();
+
+    // Log the started configuration
+    final log = Log(
+      type: 'Advanced Android Advertising',
+      message: 'Mode: Balanced (250ms interval), TX: Medium, Timeout: 60s',
+    );
+    _logs.add(log);
+    notifyListeners();
+  }
+
   void clearLogs() {
     _logs.clear();
     notifyListeners();

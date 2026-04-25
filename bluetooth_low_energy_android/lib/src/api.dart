@@ -143,6 +143,24 @@ extension GATTCharacteristicPropertyX on GATTCharacteristicProperty {
   }
 }
 
+extension AndroidAdvertiseModeX on AndroidAdvertiseMode {
+  AdvertiseModeArgs toArgs() {
+    return AdvertiseModeArgs.values[index];
+  }
+}
+
+extension AndroidTXPowerLevelX on AndroidTXPowerLevel {
+  TXPowerLevelArgs toArgs() {
+    return TXPowerLevelArgs.values[index];
+  }
+}
+
+extension AndroidPhyX on AndroidPhy {
+  PhyArgs toArgs() {
+    return PhyArgs.values[index];
+  }
+}
+
 extension GATTCharacteristicPermissionX on GATTCharacteristicPermission {
   GATTCharacteristicPermissionArgs toArgs() {
     return GATTCharacteristicPermissionArgs.values[index];
@@ -181,21 +199,40 @@ extension ManufacturerSpecificDataX on ManufacturerSpecificData {
 }
 
 extension AdvertisementX on Advertisement {
-  AdvertiseDataArgs toAdvertiseDataArgs() {
+  AdvertiseDataArgs toAdvertiseDataArgs([AndroidAdvertiseData? data]) {
+    final sourceServiceUUIDs = data?.serviceUUIDs ?? serviceUUIDs;
+    final sourceServiceData = data?.serviceData ?? serviceData;
+    final sourceManufacturerData =
+        data?.manufacturerSpecificData ?? manufacturerSpecificData;
     return AdvertiseDataArgs(
-      serviceUUIDsArgs: serviceUUIDs.map((uuid) => uuid.toArgs()).toList(),
-      serviceDataArgs: serviceData.map((uuid, data) {
+      includeDeviceNameArgs: data?.includeDeviceName,
+      includeTXPowerLevelArgs: data?.includeTxPowerLevel,
+      serviceUUIDsArgs: sourceServiceUUIDs.map((uuid) => uuid.toArgs()).toList(),
+      serviceDataArgs: sourceServiceData.map((uuid, data) {
         final uuidArgs = uuid.toArgs();
         final dataArgs = data;
         return MapEntry(uuidArgs, dataArgs);
       }),
-      manufacturerSpecificDataArgs: manufacturerSpecificData
+      manufacturerSpecificDataArgs: sourceManufacturerData
           .map((data) => data.toArgs())
           .toList(),
     );
   }
 
-  AdvertiseDataArgs toScanResponseArgs() {
+  AdvertiseDataArgs toScanResponseArgs([AndroidAdvertiseData? data]) {
+    if (data != null) {
+      return AdvertiseDataArgs(
+        includeDeviceNameArgs: data.includeDeviceName,
+        includeTXPowerLevelArgs: data.includeTxPowerLevel,
+        serviceUUIDsArgs: data.serviceUUIDs.map((uuid) => uuid.toArgs()).toList(),
+        serviceDataArgs: data.serviceData.map((uuid, value) {
+          return MapEntry(uuid.toArgs(), value);
+        }),
+        manufacturerSpecificDataArgs: data.manufacturerSpecificData
+            .map((item) => item.toArgs())
+            .toList(),
+      );
+    }
     return AdvertiseDataArgs(
       includeDeviceNameArgs: name != null,
       serviceUUIDsArgs: [],

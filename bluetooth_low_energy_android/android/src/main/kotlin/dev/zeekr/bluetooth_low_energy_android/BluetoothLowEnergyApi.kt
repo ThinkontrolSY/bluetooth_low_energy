@@ -34,6 +34,14 @@ fun TXPowerLevelArgs.toTXPowerLevel(): Int {
     }
 }
 
+fun PhyArgs.toPhy(): Int {
+    return when (this) {
+        PhyArgs.LE1M -> BluetoothDevice.PHY_LE_1M_MASK
+        PhyArgs.LE2M -> BluetoothDevice.PHY_LE_2M_MASK
+        PhyArgs.LE_CODED -> BluetoothDevice.PHY_LE_CODED_MASK
+    }
+}
+
 fun GATTCharacteristicWriteTypeArgs.toType(): Int {
     return when (this) {
         GATTCharacteristicWriteTypeArgs.WITH_RESPONSE -> BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
@@ -79,6 +87,30 @@ fun AdvertiseSettingsArgs.toAdvertiseSettings(): AdvertiseSettings {
     if (txPowerLevelArgs != null) {
         val txPowerLevel = txPowerLevelArgs.toTXPowerLevel()
         builder.setTxPowerLevel(txPowerLevel)
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val legacyArgs = this.legacyArgs
+        if (legacyArgs != null) {
+            builder.setLegacyMode(legacyArgs)
+        }
+        val anonymousArgs = this.anonymousArgs
+        if (anonymousArgs != null) {
+            builder.setAnonymous(anonymousArgs)
+        }
+        val includeTxPowerArgs = this.includeTxPowerArgs
+        if (includeTxPowerArgs != null) {
+            builder.setIncludeTxPower(includeTxPowerArgs)
+        }
+        val primaryPhyArgs = this.primaryPhyArgs
+        if (primaryPhyArgs != null) {
+            val primaryPhy = primaryPhyArgs.toPhy()
+            builder.setPrimaryPhy(primaryPhy)
+        }
+        val secondaryPhyArgs = this.secondaryPhyArgs
+        if (secondaryPhyArgs != null) {
+            val secondaryPhy = secondaryPhyArgs.toPhy()
+            builder.setSecondaryPhy(secondaryPhy)
+        }
     }
     return builder.build()
 }
