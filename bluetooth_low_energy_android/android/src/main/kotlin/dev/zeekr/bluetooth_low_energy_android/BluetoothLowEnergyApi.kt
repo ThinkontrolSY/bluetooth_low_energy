@@ -97,20 +97,9 @@ fun AdvertiseSettingsArgs.toAdvertiseSettings(): AdvertiseSettings {
         if (anonymousArgs != null) {
             builder.setAnonymous(anonymousArgs)
         }
-        val includeTxPowerArgs = this.includeTxPowerArgs
-        if (includeTxPowerArgs != null) {
-            builder.setIncludeTxPower(includeTxPowerArgs)
-        }
-        val primaryPhyArgs = this.primaryPhyArgs
-        if (primaryPhyArgs != null) {
-            val primaryPhy = primaryPhyArgs.toPhy()
-            builder.setPrimaryPhy(primaryPhy)
-        }
-        val secondaryPhyArgs = this.secondaryPhyArgs
-        if (secondaryPhyArgs != null) {
-            val secondaryPhy = secondaryPhyArgs.toPhy()
-            builder.setSecondaryPhy(secondaryPhy)
-        }
+        // AdvertiseSettings.Builder does not expose includeTxPower/primaryPhy/secondaryPhy
+        // on all Android SDK API stubs used by Gradle builds. Keep these fields in Dart API
+        // for forward compatibility, but ignore them in legacy startAdvertising() flow.
     }
     return builder.build()
 }
