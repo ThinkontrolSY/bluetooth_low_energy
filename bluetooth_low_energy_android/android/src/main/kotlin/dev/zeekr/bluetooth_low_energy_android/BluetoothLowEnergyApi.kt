@@ -89,17 +89,10 @@ fun AdvertiseSettingsArgs.toAdvertiseSettings(): AdvertiseSettings {
         builder.setTxPowerLevel(txPowerLevel)
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val legacyArgs = this.legacyArgs
-        if (legacyArgs != null) {
-            builder.setLegacyMode(legacyArgs)
-        }
-        val anonymousArgs = this.anonymousArgs
-        if (anonymousArgs != null) {
-            builder.setAnonymous(anonymousArgs)
-        }
-        // AdvertiseSettings.Builder does not expose includeTxPower/primaryPhy/secondaryPhy
-        // on all Android SDK API stubs used by Gradle builds. Keep these fields in Dart API
-        // for forward compatibility, but ignore them in legacy startAdvertising() flow.
+        // AdvertiseSettings.Builder does not expose legacy/anonymous/includeTxPower/
+        // primaryPhy/secondaryPhy on all Android SDK API stubs used by Gradle builds.
+        // Keep these fields in Dart API for forward compatibility, but ignore them
+        // in the current startAdvertising() flow to guarantee build compatibility.
     }
     return builder.build()
 }
